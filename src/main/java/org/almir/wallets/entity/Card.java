@@ -2,6 +2,7 @@ package org.almir.wallets.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.almir.wallets.converter.CardNumberConverter;
 import org.almir.wallets.enums.CardStatus;
 
 import java.time.YearMonth;
@@ -23,6 +24,7 @@ public class Card {
     @Column(name = "card_number", nullable = false)
     private String cardNumber;
 
+    @Convert(converter = CardNumberConverter.class)
     @Column(name = "masked_number", nullable = false)
     private String maskedNumber;
 
