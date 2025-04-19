@@ -1,6 +1,7 @@
 package org.almir.wallets.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.almir.wallets.dto.CardRequestDTO;
 import org.almir.wallets.entity.Card;
 import org.almir.wallets.entity.User;
 import org.almir.wallets.enums.CardStatus;
@@ -41,14 +42,11 @@ public class CardServiceImpl implements CardService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User not found: " + userId));
 
-        Card card = Card.builder()
-                .cardNumber(cardNumber)
-                .maskedNumber(maskCardNumber(cardNumber))
-                .user(user)
-                .expiryDate(expiryDate)
-                .status(CardStatus.ACTIVE)
-                .balance(initialBalance)
-                .build();
+        CardRequestDTO requestDto = new CardRequestDTO(cardNumber, expiryDate, initialBalance, userId);
+        Card card = cardMapper.toEntity(requestDto);
+        card.setUser(user);
+        card.setMaskedNumber(maskCardNumber(cardNumber));
+        card.setStatus(CardStatus.ACTIVE);
 
         return cardRepository.save(card);
     }
