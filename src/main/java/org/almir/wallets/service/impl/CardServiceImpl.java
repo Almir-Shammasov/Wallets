@@ -4,12 +4,16 @@ import lombok.RequiredArgsConstructor;
 import org.almir.wallets.entity.Card;
 import org.almir.wallets.entity.User;
 import org.almir.wallets.enums.CardStatus;
+import org.almir.wallets.enums.Role;
 import org.almir.wallets.exception.*;
+import org.almir.wallets.mapper.CardMapper;
 import org.almir.wallets.repository.CardRepository;
 import org.almir.wallets.repository.UserRepository;
 import org.almir.wallets.service.CardService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,10 +28,12 @@ public class CardServiceImpl implements CardService {
 
     private final CardRepository cardRepository;
     private final UserRepository userRepository;
+    private final CardMapper cardMapper;
 
     @Override
     @Transactional
     public Card createCard(long userId, String cardNumber, YearMonth expiryDate, double initialBalance) {
+        checkAdminAccess();
         validateCardNumber(cardNumber);
         validateExpiryDate(expiryDate);
         validateBalance(initialBalance);
@@ -73,6 +79,15 @@ public class CardServiceImpl implements CardService {
 
         card.setStatus(CardStatus.BLOCKED);
         cardRepository.save(card);
+    }
+
+    private void checkAdminAccess() {
+        String currentEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        User currentUser = userRepository.findByEmail(currentEmail)
+                .orElseThrow(() -> new UserNotFoundException("Current user not found"));
+        if (!currentUser.getRole().equals(Role.ADMIN)) {
+            throw new AccessDeniedException("Admin access required");
+        }
     }
 
     private void validateCardNumber(String cardNumber) {
