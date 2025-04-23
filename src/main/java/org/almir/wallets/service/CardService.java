@@ -33,4 +33,8 @@ public interface CardService {
      * @param userId the ID of the user (for user role validation)
      */
     void blockCard(long cardId, long userId) throws AccessDeniedException;
+
+    void requestBlockCard(Long userId, Long cardId);
+    void activateCard(Long userId, Long cardId);
+    void deleteCard(Long userId, Long cardId);
 }

@@ -2,6 +2,8 @@ package org.almir.wallets.service;
 
 import org.almir.wallets.entity.User;
 import org.almir.wallets.enums.Role;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 /**
  * Service interface for managing user-related operations.
@@ -18,4 +20,8 @@ public interface UserService {
      * @throws IllegalArgumentException if the email is already registered
      */
     User registerUser(String email, String password, String name, Role role);
+
+    Page<User> getUsers(Pageable pageable);
+    User updateUser(Long userId, String email, String password, String name, Role role);
+    void deleteUser(Long userId);
 }

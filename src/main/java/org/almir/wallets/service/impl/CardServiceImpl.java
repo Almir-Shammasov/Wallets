@@ -79,6 +79,67 @@ public class CardServiceImpl implements CardService {
         cardRepository.save(card);
     }
 
+    @Override
+    @Transactional
+    public void requestBlockCard(Long userId, Long cardId) {
+        Card card = cardRepository.findById(cardId)
+                .orElseThrow(() -> new CardNotFoundException("Card not found: " + cardId));
+
+        if (!card.getUser().getId().equals(userId)) {
+            throw new AccessDeniedException("User does not own card: " + cardId);
+        }
+
+        if (card.getStatus() != CardStatus.ACTIVE) {
+            throw new IllegalStateException("Card is not active: " + cardId);
+        }
+
+        if (card.isBlockRequested()) {
+            throw new IllegalStateException("Block request already exists for card: " + cardId);
+        }
+
+        card.setBlockRequested(true);
+        cardRepository.save(card);
+    }
+
+    @Override
+    @Transactional
+    public void activateCard(Long userId, Long cardId) {
+        Card card = cardRepository.findById(cardId)
+                .orElseThrow(() -> new CardNotFoundException("Card not found: " + cardId));
+
+        if (!userRepository.findById(userId)
+                .map(User::getRole)
+                .map(Role::name)
+                .filter(Role.ADMIN.name()::equals)
+                .isPresent()) {
+            throw new AccessDeniedException("Only admin can activate cards: " + cardId);
+        }
+
+        if (card.getStatus() != CardStatus.BLOCKED) {
+            throw new IllegalStateException("Card is not blocked: " + cardId);
+        }
+
+        card.setStatus(CardStatus.ACTIVE);
+        cardRepository.save(card);
+    }
+
+    @Override
+    @Transactional
+    public void deleteCard(Long userId, Long cardId) {
+        Card card = cardRepository.findById(cardId)
+                .orElseThrow(() -> new CardNotFoundException("Card not found: " + cardId));
+
+        if (userRepository.findById(userId)
+                .map(User::getRole)
+                .map(Role::name)
+                .filter(Role.ADMIN.name()::equals)
+                .isEmpty()) {
+            throw new AccessDeniedException("Only admin can delete cards: " + cardId);
+        }
+
+        cardRepository.delete(card);
+    }
+
     private void checkAdminAccess() {
         String currentEmail = SecurityContextHolder.getContext().getAuthentication().getName();
         User currentUser = userRepository.findByEmail(currentEmail)
@@ -95,8 +156,11 @@ public class CardServiceImpl implements CardService {
     }
 
     private void validateExpiryDate(YearMonth expiryDate) {
-        if (expiryDate == null || expiryDate.isBefore(YearMonth.now())) {
-            throw new InvalidExpiryDateException("The card has expired");
+        if (expiryDate == null) {
+            throw new InvalidExpiryDateException("Expiry date cannot be null");
+        }
+        if (expiryDate.isBefore(YearMonth.now())) {
+            throw new InvalidExpiryDateException("Expiry date must be in the future");
         }
     }
 

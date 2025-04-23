@@ -40,7 +40,7 @@ public class CardController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<CardResponseDTO>> getUserCards(
+    public ResponseEntity<Page<CardResponseDTO>> getCards(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
@@ -63,6 +63,36 @@ public class CardController {
 
         cardService.blockCard(cardId, currentUser.getId());
 
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{cardId}/request-block")
+    public ResponseEntity<Void> requestBlockCard(@PathVariable Long cardId) {
+        String currentEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        User currentUser = userRepository.findByEmail(currentEmail)
+                .orElseThrow(() -> new IllegalStateException("User not found"));
+
+        cardService.requestBlockCard(currentUser.getId(), cardId);
+        return ResponseEntity.accepted().build();
+    }
+
+    @PutMapping("/{cardId}/activate")
+    public ResponseEntity<Void> activateCard(@PathVariable Long cardId) {
+        String currentEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        User currentUser = userRepository.findByEmail(currentEmail)
+                .orElseThrow(() -> new IllegalStateException("User not found"));
+
+        cardService.activateCard(currentUser.getId(), cardId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{cardId}")
+    public ResponseEntity<Void> deleteCard(@PathVariable Long cardId) {
+        String currentEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        User currentUser = userRepository.findByEmail(currentEmail)
+                .orElseThrow(() -> new IllegalStateException("User not found"));
+
+        cardService.deleteCard(currentUser.getId(), cardId);
         return ResponseEntity.noContent().build();
     }
 }

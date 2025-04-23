@@ -1,6 +1,7 @@
 package org.almir.wallets.service;
 
 import org.almir.wallets.entity.Transaction;
+import org.springframework.data.domain.Page;
 
 public interface TransactionService {
     /**

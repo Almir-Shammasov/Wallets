@@ -3,6 +3,7 @@ package org.almir.wallets.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.almir.wallets.converter.CardNumberConverter;
+import org.almir.wallets.converter.YearMonthDateConverter;
 import org.almir.wallets.enums.CardStatus;
 
 import java.time.YearMonth;
@@ -22,6 +23,7 @@ public class Card {
     private long id;
 
     @Column(name = "card_number", nullable = false)
+    @Convert(converter = CardNumberConverter.class)
     private String cardNumber;
 
     @Convert(converter = CardNumberConverter.class)
@@ -33,6 +35,7 @@ public class Card {
     private User user;
 
     @Column(name = "expiry_date", nullable = false)
+    @Convert(converter = YearMonthDateConverter.class)
     private YearMonth expiryDate;
 
     @Enumerated(EnumType.STRING)
@@ -47,4 +50,7 @@ public class Card {
 
     @OneToMany(mappedBy = "card", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Limit> limits = new ArrayList<>();
+
+    @Column(name = "block_requested", nullable = false)
+    private boolean blockRequested;
 }

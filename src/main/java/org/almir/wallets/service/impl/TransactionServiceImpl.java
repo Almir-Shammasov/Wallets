@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.almir.wallets.entity.Card;
 import org.almir.wallets.entity.Limit;
 import org.almir.wallets.entity.Transaction;
+import org.almir.wallets.entity.User;
 import org.almir.wallets.enums.CardStatus;
 import org.almir.wallets.enums.LimitType;
 import org.almir.wallets.enums.TransactionType;
@@ -15,6 +16,7 @@ import org.almir.wallets.repository.CardRepository;
 import org.almir.wallets.repository.LimitRepository;
 import org.almir.wallets.repository.TransactionRepository;
 import org.almir.wallets.service.TransactionService;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,13 +32,16 @@ public class TransactionServiceImpl implements TransactionService {
     private final LimitRepository limitRepository;
 
     @Override
-    @Transactional
-    public Transaction transfer(long userId, long sourceCardId, long targetCardId, double amount) {
+    public Transaction transfer(Long sourceCardId, Long targetCardId, double amount) {
+        long userId = cardRepository.findById(sourceCardId)
+                .map(Card::getUser)
+                .map(User::getId)
+                .orElseThrow(() -> new CardNotFoundException("Source card not found: " + sourceCardId));
+
         validateAmount(amount);
 
         Card sourceCard = cardRepository.findById(sourceCardId)
                 .orElseThrow(() -> new CardNotFoundException("Source card not found: " + sourceCardId));
-
         Card targetCard = cardRepository.findById(targetCardId)
                 .orElseThrow(() -> new CardNotFoundException("Target card not found: " + targetCardId));
 
@@ -60,12 +65,16 @@ public class TransactionServiceImpl implements TransactionService {
         cardRepository.save(sourceCard);
         cardRepository.save(targetCard);
 
-        return transactionRepository.save(transaction);
+        return  transactionRepository.save(transaction);
     }
 
     @Override
-    @Transactional
-    public Transaction withdraw(long userId, long cardId, double amount) {
+    public Transaction withdraw(Long cardId, double amount) {
+        long userId = cardRepository.findById(cardId)
+                .map(Card::getUser)
+                .map(User::getId)
+                .orElseThrow(() -> new CardNotFoundException("Card not found: " + cardId));
+
         validateAmount(amount);
 
         Card card = cardRepository.findById(cardId)
