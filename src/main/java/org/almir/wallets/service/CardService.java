@@ -27,6 +27,8 @@ public interface CardService {
      */
     Page<Card> getUserCards(long userId, Pageable pageable);
 
+    Page<Card> getCards(Pageable pageable);
+
     /**
      * Blocks a card (user or admin).
      * @param cardId the ID of the card

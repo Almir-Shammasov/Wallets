@@ -62,6 +62,11 @@ public class CardServiceImpl implements CardService {
     }
 
     @Override
+    public Page<Card> getCards(Pageable pageable) {
+        return cardRepository.findAll(pageable);
+    }
+
+    @Override
     @Transactional
     public void blockCard(long cardId) {
         Card card = cardRepository.findById(cardId)

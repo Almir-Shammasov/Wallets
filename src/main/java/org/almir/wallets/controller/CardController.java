@@ -39,17 +39,26 @@ public class CardController {
         return ResponseEntity.status(HttpStatus.CREATED).body(cardMapper.toResponseDto(card));
     }
 
-    @GetMapping
+    @GetMapping("/{userId}")
     public ResponseEntity<Page<CardResponseDTO>> getCards(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @PathVariable long userId
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<CardResponseDTO> cards = cardService.getUserCards(userId, pageable)
+                .map(cardMapper::toResponseDto);
+
+        return ResponseEntity.ok(cards);
+    }
+
+    @GetMapping
+    public ResponseEntity<Page<CardResponseDTO>> getUserCards(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        String currentEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-        User currentUser = userRepository.findByEmail(currentEmail)
-                .orElseThrow(() -> new IllegalStateException("User not found"));
-
         Pageable pageable = PageRequest.of(page, size);
-        Page<CardResponseDTO> cards = cardService.getUserCards(currentUser.getId(), pageable)
+        Page<CardResponseDTO> cards = cardService.getCards(pageable)
                 .map(cardMapper::toResponseDto);
 
         return ResponseEntity.ok(cards);
@@ -62,7 +71,7 @@ public class CardController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/request-block/{cardId}")
+    @PutMapping("/request-block/{cardId}")
     public ResponseEntity<Void> requestBlockCard(@PathVariable Long cardId) {
         String currentEmail = SecurityContextHolder.getContext().getAuthentication().getName();
         User currentUser = userRepository.findByEmail(currentEmail)
