@@ -15,6 +15,7 @@ import org.almir.wallets.exception.OverLimitException;
 import org.almir.wallets.repository.CardRepository;
 import org.almir.wallets.repository.LimitRepository;
 import org.almir.wallets.repository.TransactionRepository;
+import org.almir.wallets.repository.UserRepository;
 import org.almir.wallets.service.TransactionService;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -28,15 +29,17 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TransactionServiceImpl implements TransactionService {
     private final CardRepository cardRepository;
+    private final UserRepository userRepository;
     private final TransactionRepository transactionRepository;
     private final LimitRepository limitRepository;
 
     @Override
     public Transaction transfer(Long sourceCardId, Long targetCardId, double amount) {
-        long userId = cardRepository.findById(sourceCardId)
-                .map(Card::getUser)
-                .map(User::getId)
-                .orElseThrow(() -> new CardNotFoundException("Source card not found: " + sourceCardId));
+        String currentEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        User currentUser = userRepository.findByEmail(currentEmail)
+                .orElseThrow(() -> new IllegalStateException("User not found"));
+        long userId = currentUser.getId();
+
 
         validateAmount(amount);
 
@@ -70,10 +73,10 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public Transaction withdraw(Long cardId, double amount) {
-        long userId = cardRepository.findById(cardId)
-                .map(Card::getUser)
-                .map(User::getId)
-                .orElseThrow(() -> new CardNotFoundException("Card not found: " + cardId));
+        String currentEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        User currentUser = userRepository.findByEmail(currentEmail)
+                .orElseThrow(() -> new IllegalStateException("User not found"));
+        long userId = currentUser.getId();
 
         validateAmount(amount);
 

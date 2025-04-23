@@ -28,8 +28,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
                         .requestMatchers( "/api/auth/login", "/api/auth/register").permitAll()
                         .requestMatchers("/api/cards/**").hasAnyRole("ADMIN", "USER")
-                        .requestMatchers("/api/cards/{cardId}/block", "/api/cards/{cardId}/activate", "/api/cards/{cardId}/delete").hasRole("ADMIN")
-                        .requestMatchers("/api/transactions/**", "/api/limits/**").hasAnyRole("ADMIN", "USER")
+                        .requestMatchers("/api/cards/block/{cardId}", "/api/cards/activate/{cardId}", "/api/cards/delete/{cardId}").hasRole("ADMIN")
+                        .requestMatchers("/api/limits/**").hasAnyRole("ADMIN")
+                        .requestMatchers("/api/transactions/transfer", "/api/transactions/withdraw").hasAnyRole("USER")
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);

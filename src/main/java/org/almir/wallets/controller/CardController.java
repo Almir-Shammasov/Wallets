@@ -55,18 +55,14 @@ public class CardController {
         return ResponseEntity.ok(cards);
     }
 
-    @PutMapping("/{cardId}/block")
+    @PutMapping("/block/{cardId}")
     public ResponseEntity<Void> blockCard(@PathVariable long cardId) throws AccessDeniedException {
-        String currentEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-        User currentUser = userRepository.findByEmail(currentEmail)
-                .orElseThrow(() -> new IllegalStateException("User not found"));
-
-        cardService.blockCard(cardId, currentUser.getId());
+        cardService.blockCard(cardId);
 
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/{cardId}/request-block")
+    @PostMapping("/request-block/{cardId}")
     public ResponseEntity<Void> requestBlockCard(@PathVariable Long cardId) {
         String currentEmail = SecurityContextHolder.getContext().getAuthentication().getName();
         User currentUser = userRepository.findByEmail(currentEmail)
@@ -76,7 +72,7 @@ public class CardController {
         return ResponseEntity.accepted().build();
     }
 
-    @PutMapping("/{cardId}/activate")
+    @PutMapping("/activate/{cardId}")
     public ResponseEntity<Void> activateCard(@PathVariable Long cardId) {
         String currentEmail = SecurityContextHolder.getContext().getAuthentication().getName();
         User currentUser = userRepository.findByEmail(currentEmail)
@@ -86,7 +82,7 @@ public class CardController {
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping("/{cardId}")
+    @DeleteMapping("/delete/{cardId}")
     public ResponseEntity<Void> deleteCard(@PathVariable Long cardId) {
         String currentEmail = SecurityContextHolder.getContext().getAuthentication().getName();
         User currentUser = userRepository.findByEmail(currentEmail)

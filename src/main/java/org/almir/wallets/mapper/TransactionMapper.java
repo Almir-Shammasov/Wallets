@@ -11,6 +11,7 @@ public interface TransactionMapper {
     TransactionMapper INSTANCE = Mappers.getMapper(TransactionMapper.class);
 
     @Mapping(source = "sourceCard.id", target = "sourceCardId")
-    @Mapping(source = "targetCard.id", target = "targetCardId", defaultValue = "null")
+    @Mapping(source = "targetCard.id", target = "targetCardId")
+    @Mapping(source = "type", target = "transactionType")
     TransactionResponseDTO toResponseDto(Transaction transaction);
 }

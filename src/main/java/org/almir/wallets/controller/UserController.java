@@ -20,7 +20,7 @@ public class UserController {
     private final UserService userService;
     private final UserMapper userMapper;
 
-    @PostMapping
+    @PostMapping("/create")
     public ResponseEntity<UserResponseDTO> createUser(@Valid @RequestBody UserRequestDTO request) {
         User user = userService.registerUser(
                 request.email(),
@@ -37,7 +37,7 @@ public class UserController {
         return ResponseEntity.ok(users.map(userMapper::toResponseDto));
     }
 
-    @PutMapping("/{userId}")
+    @PutMapping("/update/{userId}")
     public ResponseEntity<UserResponseDTO> updateUser(
             @PathVariable Long userId,
             @Valid @RequestBody UserRequestDTO request
@@ -52,7 +52,7 @@ public class UserController {
         return ResponseEntity.ok(userMapper.toResponseDto(user));
     }
 
-    @DeleteMapping("/{userId}")
+    @DeleteMapping("/delete/{userId}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long userId) {
         userService.deleteUser(userId);
         return ResponseEntity.noContent().build();

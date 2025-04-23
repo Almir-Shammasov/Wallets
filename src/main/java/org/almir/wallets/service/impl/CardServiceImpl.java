@@ -63,13 +63,9 @@ public class CardServiceImpl implements CardService {
 
     @Override
     @Transactional
-    public void blockCard(long cardId, long userId) {
+    public void blockCard(long cardId) {
         Card card = cardRepository.findById(cardId)
                 .orElseThrow(() -> new CardNotFoundException("Card not found: " + cardId));
-
-        if (!card.getUser().getId().equals(userId)) {
-            throw new CardAccessDeniedException("User does not own this card");
-        }
 
         if (card.getStatus() != CardStatus.ACTIVE) {
             throw new IllegalStateException("Card is not active");
