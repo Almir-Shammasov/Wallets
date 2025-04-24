@@ -58,10 +58,19 @@ public class CardServiceImpl implements CardService {
             throw new UserNotFoundException("User not found: " + userId);
         }
 
+        String currentEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        User currentUser = userRepository.findByEmail(currentEmail)
+                .orElseThrow(() -> new UserNotFoundException("Current user not found"));
+        long expectedUserId = currentUser.getId();
+        if (expectedUserId != userId && currentUser.getRole().name().equals("USER")) {
+            throw new CardAccessDeniedException("Access denied");
+        }
+
         return cardRepository.findByUserId(userId, pageable);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<Card> getCards(Pageable pageable) {
         return cardRepository.findAll(pageable);
     }

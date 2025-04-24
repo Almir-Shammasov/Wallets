@@ -1,6 +1,7 @@
 package org.almir.wallets.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.almir.wallets.dto.TransactionResponseDTO;
 import org.almir.wallets.entity.Card;
 import org.almir.wallets.entity.Limit;
 import org.almir.wallets.entity.Transaction;
@@ -12,11 +13,14 @@ import org.almir.wallets.exception.CardAccessDeniedException;
 import org.almir.wallets.exception.CardNotFoundException;
 import org.almir.wallets.exception.InsufficientFundsException;
 import org.almir.wallets.exception.OverLimitException;
+import org.almir.wallets.mapper.TransactionMapper;
 import org.almir.wallets.repository.CardRepository;
 import org.almir.wallets.repository.LimitRepository;
 import org.almir.wallets.repository.TransactionRepository;
 import org.almir.wallets.repository.UserRepository;
 import org.almir.wallets.service.TransactionService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -32,8 +37,10 @@ public class TransactionServiceImpl implements TransactionService {
     private final UserRepository userRepository;
     private final TransactionRepository transactionRepository;
     private final LimitRepository limitRepository;
+    private final TransactionMapper transactionMapper;
 
     @Override
+    @Transactional
     public Transaction transfer(Long sourceCardId, Long targetCardId, double amount) {
         String currentEmail = SecurityContextHolder.getContext().getAuthentication().getName();
         User currentUser = userRepository.findByEmail(currentEmail)
@@ -72,6 +79,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
+    @Transactional
     public Transaction withdraw(Long cardId, double amount) {
         String currentEmail = SecurityContextHolder.getContext().getAuthentication().getName();
         User currentUser = userRepository.findByEmail(currentEmail)
@@ -100,6 +108,39 @@ public class TransactionServiceImpl implements TransactionService {
         cardRepository.save(card);
 
         return transactionRepository.save(transaction);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<TransactionResponseDTO> getAllTransactions(Long userId, String role, Pageable pageable) {
+        if ("ADMIN".equals(role)) {
+            return transactionRepository.findAll().stream()
+                    .map(transactionMapper::toResponseDto)
+                    .toList();
+        } else {
+            List<Card> userCards = cardRepository.findByUserId(userId);
+            return userCards.stream()
+                    .flatMap(card -> transactionRepository.findByCardId(card.getId())
+                            .stream().map(transactionMapper::toResponseDto)).distinct()
+                    .toList();
+
+        }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<TransactionResponseDTO> getTransactionsByCardNumber(String cardNumber, Long userId, String role) {
+        Card card = cardRepository.findByCardNumber(cardNumber)
+                .orElseThrow(() -> new CardNotFoundException("Card not found: " + cardNumber));
+        long cardId = card.getId();
+
+        if ("USER".equals(role) && !card.getUser().getId().equals(userId)) {
+            throw new CardAccessDeniedException("User does not have permission to view transactions for card: " + cardNumber);
+        }
+
+        return transactionRepository.findByCardId(cardId).stream()
+                .map(transactionMapper::toResponseDto)
+                .toList();
     }
 
     private void validateAmount(double amount) {

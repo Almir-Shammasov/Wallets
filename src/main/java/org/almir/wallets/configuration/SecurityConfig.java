@@ -26,12 +26,17 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
-                        .requestMatchers( "/api/auth/login", "/api/auth/register").permitAll()
-                        .requestMatchers("/api/cards/request-block/", "/api/cards/{userId}").hasAnyRole("USER", "ADMIN")
-                        .requestMatchers("/api/cards/**").hasRole("ADMIN")
-                        .requestMatchers("/api/cards/block/{cardId}", "/api/cards/activate/{cardId}", "/api/cards/delete/{cardId}").hasRole("ADMIN")
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/users/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/cards/{cardId}").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/cards/request-block/{cardId}").hasAnyRole("ADMIN", "USER")
+                        .requestMatchers(HttpMethod.POST, "/api/cards/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/cards/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/cards/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/cards/**").hasRole("ADMIN")
+                        .requestMatchers("/api/limits/{cardId}").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/api/limits/**").hasRole("ADMIN")
-                        .requestMatchers("/api/transactions/transfer", "/api/transactions/withdraw").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/api/transactions/**").hasAnyRole("ADMIN", "USER")
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);

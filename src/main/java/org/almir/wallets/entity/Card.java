@@ -22,7 +22,7 @@ public class Card {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(name = "card_number", nullable = false)
+    @Column(name = "card_number", nullable = false, unique = true)
     @Convert(converter = CardNumberConverter.class)
     private String cardNumber;
 
@@ -45,8 +45,8 @@ public class Card {
     @Column(name = "balance", nullable = false)
     private double balance;
 
-    @OneToMany(mappedBy = "sourceCard", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Transaction> transactions = new ArrayList<>();
+//    @OneToMany(mappedBy = "sourceCard", cascade = CascadeType.ALL, orphanRemoval = true)
+//    private List<Transaction> transactions = new ArrayList<>();
 
     @OneToMany(mappedBy = "card", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Limit> limits = new ArrayList<>();

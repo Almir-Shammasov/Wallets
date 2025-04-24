@@ -1,0 +1,9 @@
+databaseChangeLog:
+  - changeSet:
+      id: 6
+      author: almir
+      changes:
+        - addUniqueConstraint:
+            tableName: cards
+            columnNames: card_number
+            constraintName: uk_card_number

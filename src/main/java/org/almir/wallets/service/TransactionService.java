@@ -1,7 +1,11 @@
 package org.almir.wallets.service;
 
+import org.almir.wallets.dto.TransactionResponseDTO;
 import org.almir.wallets.entity.Transaction;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
+import java.util.List;
 
 public interface TransactionService {
     /**
@@ -20,4 +24,7 @@ public interface TransactionService {
      * @return the created transaction
      */
     Transaction withdraw(Long cardId, double amount);
+
+    List<TransactionResponseDTO> getAllTransactions(Long userId, String role, Pageable pageable);
+    List<TransactionResponseDTO> getTransactionsByCardNumber(String cardNumber, Long userId, String role);
 }

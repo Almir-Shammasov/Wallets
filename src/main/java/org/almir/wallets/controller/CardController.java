@@ -40,7 +40,7 @@ public class CardController {
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<Page<CardResponseDTO>> getCards(
+    public ResponseEntity<Page<CardResponseDTO>> getUserCards(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @PathVariable long userId
@@ -53,7 +53,7 @@ public class CardController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<CardResponseDTO>> getUserCards(
+    public ResponseEntity<Page<CardResponseDTO>> getCards(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {

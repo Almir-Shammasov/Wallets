@@ -9,3 +9,5 @@ databaseChangeLog:
       file: db/changelog/create/liquibase-create-limits-table.yaml
   - include:
       file: db/changelog/changes/add-unique-limit-constraint.yaml
+  - include:
+      file: db/changelog/changes/add-unique-card-number.yaml
