@@ -26,7 +26,6 @@ public class Card {
     @Convert(converter = CardNumberConverter.class)
     private String cardNumber;
 
-    @Convert(converter = CardNumberConverter.class)
     @Column(name = "masked_number", nullable = false)
     private String maskedNumber;
 
@@ -44,9 +43,6 @@ public class Card {
 
     @Column(name = "balance", nullable = false)
     private double balance;
-
-//    @OneToMany(mappedBy = "sourceCard", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<Transaction> transactions = new ArrayList<>();
 
     @OneToMany(mappedBy = "card", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Limit> limits = new ArrayList<>();

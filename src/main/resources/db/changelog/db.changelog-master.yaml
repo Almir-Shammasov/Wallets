@@ -11,3 +11,5 @@ databaseChangeLog:
       file: db/changelog/changes/add-unique-limit-constraint.yaml
   - include:
       file: db/changelog/changes/add-unique-card-number.yaml
+  - include:
+      file: db/changelog/changes/update-transaction-fk-source-card.yaml

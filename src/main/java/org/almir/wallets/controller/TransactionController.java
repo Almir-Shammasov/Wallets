@@ -9,13 +9,12 @@ import org.almir.wallets.entity.Transaction;
 import org.almir.wallets.entity.User;
 import org.almir.wallets.enums.Role;
 import org.almir.wallets.mapper.TransactionMapper;
-import org.almir.wallets.repository.UserRepository;
 import org.almir.wallets.service.TransactionService;
+import org.almir.wallets.utils.SecurityUtils;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,7 +25,7 @@ import java.util.List;
 public class TransactionController {
     private final TransactionService transactionService;
     private final TransactionMapper transactionMapper;
-    private final UserRepository userRepository;
+    private final SecurityUtils securityUtils;
 
     @PostMapping("/transfer")
     public ResponseEntity<TransactionResponseDTO> transfer(@Valid @RequestBody TransferRequestDTO transferRequest) {
@@ -53,13 +52,11 @@ public class TransactionController {
     public ResponseEntity<List<TransactionResponseDTO>> getAllTransactions(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        String currentEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-        User currentUser = userRepository.findByEmail(currentEmail)
-                .orElseThrow(() -> new IllegalStateException("User not found"));
-
+        User currentUser = securityUtils.getCurrentUser();
         Pageable pageable = PageRequest.of(page, size);
         long userId = currentUser.getId();
         Role role = currentUser.getRole();
+
         List<TransactionResponseDTO> transactions = transactionService.getAllTransactions(
                 userId, role.name(), pageable);
         return ResponseEntity.ok(transactions);
@@ -68,11 +65,10 @@ public class TransactionController {
     @GetMapping("/card/{cardNumber}")
     public ResponseEntity<List<TransactionResponseDTO>> getTransactionsByCardNumber(
             @PathVariable String cardNumber) {
-        String currentEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-        User currentUser = userRepository.findByEmail(currentEmail)
-                .orElseThrow(() -> new IllegalStateException("User not found"));
+        User currentUser = securityUtils.getCurrentUser();
         long userId = currentUser.getId();
         String role = currentUser.getRole().name();
+
         List<TransactionResponseDTO> transactions = transactionService.getTransactionsByCardNumber(
                 cardNumber, userId, role);
         return ResponseEntity.ok(transactions);

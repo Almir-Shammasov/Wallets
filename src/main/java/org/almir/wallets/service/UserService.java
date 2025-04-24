@@ -17,11 +17,32 @@ public interface UserService {
      * @param name     the full name of the user
      * @param role     the role assigned to the user (e.g., ADMIN, USER)
      * @return the created {@link User} entity
-     * @throws IllegalArgumentException if the email is already registered
      */
     User registerUser(String email, String password, String name, Role role);
 
+    /**
+     * Retrieves a paginated list of users.
+     *
+     * @param pageable the pagination information (page number, size, sorting)
+     * @return a Page of User entities
+     */
     Page<User> getUsers(Pageable pageable);
+    /**
+     * Updates an existing user with the provided details.
+     *
+     * @param userId the ID of the user to update
+     * @param email the new email address for the user
+     * @param password the new password for the user
+     * @param name the new name for the user
+     * @param role the new role for the user
+     * @return the updated User entity
+     */
     User updateUser(Long userId, String email, String password, String name, Role role);
+
+    /**
+     * Deletes a user by their ID.
+     *
+     * @param userId the ID of the user to delete
+     */
     void deleteUser(Long userId);
 }

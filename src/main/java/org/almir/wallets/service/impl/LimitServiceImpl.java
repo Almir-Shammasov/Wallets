@@ -6,14 +6,11 @@ import org.almir.wallets.entity.Limit;
 import org.almir.wallets.entity.User;
 import org.almir.wallets.enums.LimitType;
 import org.almir.wallets.exception.CardAccessDeniedException;
-import org.almir.wallets.exception.CardNotFoundException;
 import org.almir.wallets.exception.LimitAlreadyExistsException;
 import org.almir.wallets.exception.LimitNotFoundException;
-import org.almir.wallets.repository.CardRepository;
 import org.almir.wallets.repository.LimitRepository;
-import org.almir.wallets.repository.UserRepository;
 import org.almir.wallets.service.LimitService;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.almir.wallets.utils.SecurityUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,15 +20,14 @@ import java.util.List;
 @RequiredArgsConstructor
 public class LimitServiceImpl implements LimitService {
     private final LimitRepository limitRepository;
-    private final CardRepository cardRepository;
-    private final UserRepository userRepository;
+    private final SecurityUtils securityUtils;
+
     @Override
     @Transactional
     public Limit createLimit(long cardId, String limitType, double amount) {
         validateAmount(amount);
 
-        Card card = cardRepository.findById(cardId)
-                .orElseThrow(() -> new CardNotFoundException("Card not found: " + cardId));
+        Card card = securityUtils.getCardById(cardId);
 
         LimitType parsedLimitType;
         try {
@@ -57,12 +53,10 @@ public class LimitServiceImpl implements LimitService {
     @Override
     @Transactional(readOnly = true)
     public List<Limit> getLimits(long cardId) {
-        String currentEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-        User currentUser = userRepository.findByEmail(currentEmail)
-                .orElseThrow(() -> new IllegalStateException("User not found"));
-        Card card = cardRepository.findById(cardId)
-                .orElseThrow(() -> new CardNotFoundException("Card not found"));
+        User currentUser = securityUtils.getCurrentUser();
+        Card card = securityUtils.getCardById(cardId);
         long userId = currentUser.getId();
+
         if (currentUser.getRole().name().equals("USER") && card.getUser().getId() != userId) {
             throw new CardAccessDeniedException("User does not own card: " + card.getId());
         }

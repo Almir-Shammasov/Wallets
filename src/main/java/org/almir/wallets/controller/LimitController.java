@@ -5,15 +5,12 @@ import lombok.RequiredArgsConstructor;
 import org.almir.wallets.dto.LimitRequestDTO;
 import org.almir.wallets.dto.LimitResponseDTO;
 import org.almir.wallets.entity.Limit;
-import org.almir.wallets.entity.User;
-import org.almir.wallets.enums.Role;
-import org.almir.wallets.exception.CardAccessDeniedException;
 import org.almir.wallets.mapper.LimitMapper;
 import org.almir.wallets.repository.UserRepository;
 import org.almir.wallets.service.LimitService;
+import org.almir.wallets.utils.SecurityUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,11 +21,11 @@ import java.util.List;
 public class LimitController {
     private final LimitService limitService;
     private final LimitMapper limitMapper;
-    private final UserRepository userRepository;
+    private final SecurityUtils securityUtils;
 
     @PostMapping
     public ResponseEntity<LimitResponseDTO> createLimit(@Valid @RequestBody LimitRequestDTO request) {
-        checkAdminRole();
+        securityUtils.checkAdminRole();
 
         Limit limit = limitService.createLimit(
                 request.cardId(),
@@ -50,7 +47,7 @@ public class LimitController {
             @PathVariable long limitId,
             @RequestBody LimitRequestDTO request
     ) {
-        checkAdminRole();
+        securityUtils.checkAdminRole();
 
         Limit limit = limitService.updateLimit(limitId, request.amount());
         return ResponseEntity.ok(limitMapper.toResponseDto(limit));
@@ -58,19 +55,9 @@ public class LimitController {
 
     @DeleteMapping("/{limitId}")
     public ResponseEntity<Void> deleteLimit(@PathVariable Long limitId) {
-        checkAdminRole();
+        securityUtils.checkAdminRole();
 
         limitService.deleteLimit(limitId);
         return ResponseEntity.noContent().build();
-    }
-
-    private void checkAdminRole() {
-        String currentEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-        User currentUser = userRepository.findByEmail(currentEmail)
-                .orElseThrow(() -> new IllegalStateException("User not found"));
-
-        if (!currentUser.getRole().name().equals(Role.ADMIN.name())) {
-            throw new CardAccessDeniedException("Only admin can manage limits");
-        }
     }
 }

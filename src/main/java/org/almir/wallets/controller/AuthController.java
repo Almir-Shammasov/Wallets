@@ -34,11 +34,12 @@ public class AuthController {
         );
 
         final UserDetails userDetails = userDetailsService.loadUserByUsername(request.email());
-        final String jwt = jwtUtil.generateToken(userDetails.getUsername(), userDetails.getAuthorities()
-                .iterator()
-                .next()
-                .getAuthority()
-                .substring(5));
+        final String jwt = jwtUtil.generateToken(userDetails.getUsername(),
+                userDetails.getAuthorities()
+                    .iterator()
+                    .next()
+                    .getAuthority()
+                    .substring(5));
 
         return new AuthResponseDTO(jwt, userDetails.getUsername());
     }
@@ -53,7 +54,13 @@ public class AuthController {
         );
 
         final UserDetails userDetails = userDetailsService.loadUserByUsername(user.getEmail());
-        final String jwt = jwtUtil.generateToken(userDetails.getUsername(), userDetails.getAuthorities().iterator().next().getAuthority().substring(5));
+        final String jwt = jwtUtil.generateToken(
+                userDetails.getUsername(),
+                userDetails.getAuthorities()
+                        .iterator()
+                        .next()
+                        .getAuthority()
+                        .substring(5));
 
         return new AuthResponseDTO(jwt, userDetails.getUsername());
     }

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.almir.wallets.entity.User;
 import org.almir.wallets.enums.Role;
 import org.almir.wallets.exception.UserNotFoundException;
+import org.almir.wallets.exception.UserWithEmailExistsException;
 import org.almir.wallets.repository.UserRepository;
 import org.almir.wallets.service.UserService;
 import org.springframework.data.domain.Page;
@@ -21,8 +22,8 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public User registerUser(String email, String password, String name, Role role) {
-        if (userRepository.findByEmail(email).isPresent()) {
-            throw new IllegalArgumentException("Email already exist");
+        if (userIsPresent(email)) {
+            throw new UserWithEmailExistsException("Email already exist");
         }
 
         User user = User.builder()
@@ -37,7 +38,7 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public Page<User> getUsers(Pageable pageable) {
         return userRepository.findAll(pageable);
     }
@@ -48,8 +49,8 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User not found: " + userId));
 
-        if (!user.getEmail().equals(email) && userRepository.findByEmail(email).isPresent()) {
-            throw new IllegalArgumentException("Email already exists");
+        if (!user.getEmail().equals(email) && userIsPresent(email)) {
+            throw new UserWithEmailExistsException("Email already exists");
         }
 
         user.setEmail(email);
@@ -67,5 +68,9 @@ public class UserServiceImpl implements UserService {
             throw new UserNotFoundException("User not found: " + userId);
         }
         userRepository.deleteById(userId);
+    }
+
+    private boolean userIsPresent(String email) {
+        return userRepository.findByEmail(email).isPresent();
     }
 }

@@ -11,10 +11,9 @@ import org.almir.wallets.mapper.CardMapper;
 import org.almir.wallets.repository.CardRepository;
 import org.almir.wallets.repository.UserRepository;
 import org.almir.wallets.service.CardService;
+import org.almir.wallets.utils.SecurityUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,11 +29,15 @@ public class CardServiceImpl implements CardService {
     private final CardRepository cardRepository;
     private final UserRepository userRepository;
     private final CardMapper cardMapper;
+    private final SecurityUtils securityUtils;
 
     @Override
     @Transactional
     public Card createCard(long userId, String cardNumber, YearMonth expiryDate, double initialBalance) {
-        checkAdminAccess();
+        if(cardRepository.existsByCardNumber(cardNumber)) {
+            throw new CardAlreadyExistsException("Card id already exist " + cardNumber);
+        }
+        securityUtils.checkAdminAccess();
         validateCardNumber(cardNumber);
         validateExpiryDate(expiryDate);
         validateBalance(initialBalance);
@@ -58,12 +61,11 @@ public class CardServiceImpl implements CardService {
             throw new UserNotFoundException("User not found: " + userId);
         }
 
-        String currentEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-        User currentUser = userRepository.findByEmail(currentEmail)
-                .orElseThrow(() -> new UserNotFoundException("Current user not found"));
+        User currentUser = securityUtils.getCurrentUser();
         long expectedUserId = currentUser.getId();
+
         if (expectedUserId != userId && currentUser.getRole().name().equals("USER")) {
-            throw new CardAccessDeniedException("Access denied");
+            throw new CardAccessDeniedException("Access denied to cards of user: " + userId);
         }
 
         return cardRepository.findByUserId(userId, pageable);
@@ -78,11 +80,11 @@ public class CardServiceImpl implements CardService {
     @Override
     @Transactional
     public void blockCard(long cardId) {
-        Card card = cardRepository.findById(cardId)
-                .orElseThrow(() -> new CardNotFoundException("Card not found: " + cardId));
+        securityUtils.checkAdminAccess();
+        Card card = securityUtils.getCardById(cardId);
 
         if (card.getStatus() != CardStatus.ACTIVE) {
-            throw new IllegalStateException("Card is not active");
+            throw new InvalidCardStatusException("Card is not active: " + cardId);
         }
 
         card.setStatus(CardStatus.BLOCKED);
@@ -92,19 +94,18 @@ public class CardServiceImpl implements CardService {
     @Override
     @Transactional
     public void requestBlockCard(Long userId, Long cardId) {
-        Card card = cardRepository.findById(cardId)
-                .orElseThrow(() -> new CardNotFoundException("Card not found: " + cardId));
+        Card card = securityUtils.getCardById(cardId);
 
         if (!card.getUser().getId().equals(userId)) {
-            throw new AccessDeniedException("User does not own card: " + cardId);
+            throw new CardAccessDeniedException("User does not own card: " + cardId);
         }
 
         if (card.getStatus() != CardStatus.ACTIVE) {
-            throw new IllegalStateException("Card is not active: " + cardId);
+            throw new InvalidCardStatusException("Card is not active: " + cardId);
         }
 
         if (card.isBlockRequested()) {
-            throw new IllegalStateException("Block request already exists for card: " + cardId);
+            throw new InvalidCardStatusException("Block request already exists for card: " + cardId);
         }
 
         card.setBlockRequested(true);
@@ -114,19 +115,19 @@ public class CardServiceImpl implements CardService {
     @Override
     @Transactional
     public void activateCard(Long userId, Long cardId) {
-        Card card = cardRepository.findById(cardId)
-                .orElseThrow(() -> new CardNotFoundException("Card not found: " + cardId));
+        securityUtils.checkAdminAccess();
+        Card card = securityUtils.getCardById(cardId);
 
-        if (!userRepository.findById(userId)
+        if (userRepository.findById(userId)
                 .map(User::getRole)
                 .map(Role::name)
                 .filter(Role.ADMIN.name()::equals)
-                .isPresent()) {
-            throw new AccessDeniedException("Only admin can activate cards: " + cardId);
+                .isEmpty()) {
+            throw new CardAccessDeniedException("Only admin can activate cards: " + cardId);
         }
 
         if (card.getStatus() != CardStatus.BLOCKED) {
-            throw new IllegalStateException("Card is not blocked: " + cardId);
+            throw new InvalidCardStatusException("Card is not blocked: " + cardId);
         }
 
         card.setStatus(CardStatus.ACTIVE);
@@ -136,27 +137,10 @@ public class CardServiceImpl implements CardService {
     @Override
     @Transactional
     public void deleteCard(Long userId, Long cardId) {
-        Card card = cardRepository.findById(cardId)
-                .orElseThrow(() -> new CardNotFoundException("Card not found: " + cardId));
-
-        if (userRepository.findById(userId)
-                .map(User::getRole)
-                .map(Role::name)
-                .filter(Role.ADMIN.name()::equals)
-                .isEmpty()) {
-            throw new AccessDeniedException("Only admin can delete cards: " + cardId);
-        }
+        securityUtils.checkAdminAccess();
+        Card card = securityUtils.getCardById(cardId);
 
         cardRepository.delete(card);
-    }
-
-    private void checkAdminAccess() {
-        String currentEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-        User currentUser = userRepository.findByEmail(currentEmail)
-                .orElseThrow(() -> new UserNotFoundException("Current user not found"));
-        if (!currentUser.getRole().equals(Role.ADMIN)) {
-            throw new AccessDeniedException("Admin access required");
-        }
     }
 
     private void validateCardNumber(String cardNumber) {

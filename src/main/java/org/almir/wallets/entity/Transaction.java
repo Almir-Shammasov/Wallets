@@ -3,6 +3,8 @@ package org.almir.wallets.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.almir.wallets.enums.TransactionType;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDateTime;
 
@@ -29,7 +31,8 @@ public class Transaction {
     private LocalDateTime transactionTime;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "source_card_id", nullable = false)
+    @JoinColumn(name = "source_card_id", foreignKey = @ForeignKey(name = "fk_transactions_source_card"))
+    @OnDelete(action = OnDeleteAction.NO_ACTION)
     private Card sourceCard;
 
     @ManyToOne(fetch = FetchType.LAZY)

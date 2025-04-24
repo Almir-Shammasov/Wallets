@@ -19,16 +19,14 @@ import org.almir.wallets.repository.LimitRepository;
 import org.almir.wallets.repository.TransactionRepository;
 import org.almir.wallets.repository.UserRepository;
 import org.almir.wallets.service.TransactionService;
-import org.springframework.data.domain.Page;
+import org.almir.wallets.utils.SecurityUtils;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -38,18 +36,14 @@ public class TransactionServiceImpl implements TransactionService {
     private final TransactionRepository transactionRepository;
     private final LimitRepository limitRepository;
     private final TransactionMapper transactionMapper;
+    private final SecurityUtils securityUtils;
 
     @Override
     @Transactional
     public Transaction transfer(Long sourceCardId, Long targetCardId, double amount) {
-        String currentEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-        User currentUser = userRepository.findByEmail(currentEmail)
-                .orElseThrow(() -> new IllegalStateException("User not found"));
-        long userId = currentUser.getId();
-
-
         validateAmount(amount);
 
+        long userId = securityUtils.getCurrentUser().getId();
         Card sourceCard = cardRepository.findById(sourceCardId)
                 .orElseThrow(() -> new CardNotFoundException("Source card not found: " + sourceCardId));
         Card targetCard = cardRepository.findById(targetCardId)
@@ -81,16 +75,10 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     @Transactional
     public Transaction withdraw(Long cardId, double amount) {
-        String currentEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-        User currentUser = userRepository.findByEmail(currentEmail)
-                .orElseThrow(() -> new IllegalStateException("User not found"));
-        long userId = currentUser.getId();
+        long userId = securityUtils.getCurrentUser().getId();
+        Card card = securityUtils.getCardById(cardId);
 
         validateAmount(amount);
-
-        Card card = cardRepository.findById(cardId)
-                .orElseThrow(() -> new CardNotFoundException("Card not found: " + cardId));
-
         validateCardOwnership(userId, card);
         validateCardStatus(card);
         validateBalance(card, amount);
