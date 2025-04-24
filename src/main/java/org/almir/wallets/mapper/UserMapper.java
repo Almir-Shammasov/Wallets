@@ -12,9 +12,4 @@ public interface UserMapper {
     UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
 
     UserResponseDTO toResponseDto(User user);
-
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "password", ignore = true)
-    @Mapping(target = "cards", ignore = true)
-    User toEntity(UserRequestDTO requestDto);
 }

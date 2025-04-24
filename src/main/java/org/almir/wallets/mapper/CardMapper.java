@@ -19,7 +19,6 @@ public interface CardMapper {
     @Mapping(target = "status", ignore = true)
     @Mapping(target = "balance", source = "initialBalance")
     @Mapping(target = "user", ignore = true)
-    @Mapping(target = "transactions", ignore = true)
     @Mapping(target = "limits", ignore = true)
     Card toEntity(CardRequestDTO requestDto);
 }
