@@ -13,3 +13,5 @@ databaseChangeLog:
       file: db/changelog/changes/add-unique-card-number.yaml
   - include:
       file: db/changelog/changes/update-transaction-fk-source-card.yaml
+  - include:
+      file: db/changelog/changes/insert-admin-user.yaml

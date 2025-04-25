@@ -1,0 +1,20 @@
+databaseChangeLog:
+  - changeSet:
+      id: 8
+      author: almir
+      changes:
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: email
+                  value: "root@mail.com"
+              - column:
+                  name: password
+                  value: "$2a$12$u8AChkJZbnxjqaJ6qdmPnuLmeESx6Zk2ELq7q7YlrRpMTg7rLBxU6"
+              - column:
+                  name: name
+                  value: "Your_name"
+              - column:
+                  name: role
+                  value: "ADMIN"

@@ -1,0 +1,701 @@
+{
+	"info": {
+		"_postman_id": "a971d027-0300-4d1d-b14e-ffabde9cde7c",
+		"name": "Wallets",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "33017499"
+	},
+	"item": [
+		{
+			"name": "Логин",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"email\": \"root@mail.com\",\r\n  \"password\": \"1111\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/api/auth/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"api",
+						"auth",
+						"login"
+					]
+				},
+				"description": "Логгин по почте и паролю"
+			},
+			"response": []
+		},
+		{
+			"name": "Регистрация пользователя(USER)",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"Georgiy\",\r\n  \"email\": \"user3@mail.com\",\r\n  \"password\": \"1111\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/api/auth/register",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"api",
+						"auth",
+						"register"
+					]
+				},
+				"description": "Регистрация пользователя"
+			},
+			"response": []
+		},
+		{
+			"name": "Создание пользователя(ADMIN)",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJyb290QG1haWwuY29tIiwicm9sZSI6IkFETUlOIiwiZXhwIjoxNzQ5MDA2ODU1LCJpYXQiOjE3NDU0MDY4NTV9.sGlN8fWHzrftX_1QFH9RQ5F0Pu8VCXBSU-ANfz8D6E6aMmy857dMkqA1vtqHnOoZxLOtdG40cqq2-3GVEIeCRA",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"email\": \"user111@mail.com\",\r\n  \"password\": \"1111\",\r\n  \"name\": \"Alexandr\",\r\n  \"role\": \"ADMIN\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/api/users/create",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"api",
+						"users",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Получение списка пользователей",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c2VyMUBtYWlsLmNvbSIsInJvbGUiOiJVU0VSIiwiZXhwIjoxNzQ5MDI3ODA4LCJpYXQiOjE3NDU0Mjc4MDh9.G83bucXdxAYRKaQhaCaeIM45g-xkmQ_lcWy6xn8tmyHClLCcdWoLtdD5RDTie0Its3ucrF4E8dvJ3KEZKOLiAQ",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8081/api/users",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"api",
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Обновление пользователя",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJyb290QG1haWwuY29tIiwicm9sZSI6IkFETUlOIiwiZXhwIjoxNzQ5MDI0NjU5LCJpYXQiOjE3NDU0MjQ2NTl9.dGzrzLwX6lebSpAKx2lrDtmvrL5D1viMqEXxYMQdwhTK9bmDKi8tZkGIrPmo-761d1U14o4VocDwplol65qOZg",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"Gregoriy\",\r\n  \"email\": \"user2@mail.com\",\r\n  \"password\": \"1111\",\r\n  \"role\": \"USER\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/api/users/update/6",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"api",
+						"users",
+						"update",
+						"6"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Удаление пользователя",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJyb290QG1haWwuY29tIiwicm9sZSI6IkFETUlOIiwiZXhwIjoxNzQ5MDI0NjU5LCJpYXQiOjE3NDU0MjQ2NTl9.dGzrzLwX6lebSpAKx2lrDtmvrL5D1viMqEXxYMQdwhTK9bmDKi8tZkGIrPmo-761d1U14o4VocDwplol65qOZg",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8081/api/users/delete/3",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"api",
+						"users",
+						"delete",
+						"3"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Создать карту",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJyb290QG1haWwuY29tIiwicm9sZSI6IkFETUlOIiwiZXhwIjoxNzQ5MDA2ODU1LCJpYXQiOjE3NDU0MDY4NTV9.sGlN8fWHzrftX_1QFH9RQ5F0Pu8VCXBSU-ANfz8D6E6aMmy857dMkqA1vtqHnOoZxLOtdG40cqq2-3GVEIeCRA",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"cardNumber\": \"1234567890666669\",\r\n  \"expiryDate\": \"2027-12\",\r\n  \"initialBalance\": 100000.0,\r\n  \"userId\": 2\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/api/cards",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"api",
+						"cards"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Просмотр карт",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJyb290QG1haWwuY29tIiwicm9sZSI6IkFETUlOIiwiZXhwIjoxNzQ5MDc4MzA1LCJpYXQiOjE3NDU0NzgzMDV9.X_8Yx2x_YjxhOLB9a2Z1n69UXdXvVEYbh8HEaFEAitHv1XFbqqhDW9QUUjN5w3mCR7jaz0be3rA4YpDxJxP3-g",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8081/api/cards",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"api",
+						"cards"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Блокировка карты",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJyb290QG1haWwuY29tIiwicm9sZSI6IkFETUlOIiwiZXhwIjoxNzQ5MDI0NjU5LCJpYXQiOjE3NDU0MjQ2NTl9.dGzrzLwX6lebSpAKx2lrDtmvrL5D1viMqEXxYMQdwhTK9bmDKi8tZkGIrPmo-761d1U14o4VocDwplol65qOZg",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/cards/block/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"cards",
+						"block",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Запрос на блокировку карты",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c2VyMUBtYWlsLmNvbSIsInJvbGUiOiJVU0VSIiwiZXhwIjoxNzQ5MTI1OTExLCJpYXQiOjE3NDU1MjU5MTF9.mlrq7qs9Cl_GdExw7_dSAoKI7sXNxarg4zIx2VbiqqkX_O86VCQIraZwutRFVfa_Obqvp-m0Bys0vb9dHpOnOA",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/cards/request-block/10",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"cards",
+						"request-block",
+						"10"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Активация карты",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJyb290QG1haWwuY29tIiwicm9sZSI6IkFETUlOIiwiZXhwIjoxNzQ5MDI4MDQ1LCJpYXQiOjE3NDU0MjgwNDV9.ETewInrIq8Q8IfEN7QLj9TZnNhSjpdmALv4gbBX6nTigOejq9vci_ZBKyMm2uPCND0AyOWzYjVlfhTNJWa-knA",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8081/api/cards/activate/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"api",
+						"cards",
+						"activate",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Удаление карты",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJyb290QG1haWwuY29tIiwicm9sZSI6IkFETUlOIiwiZXhwIjoxNzQ5MDI4NDA1LCJpYXQiOjE3NDU0Mjg0MDV9.WUxQBjk61Sw8rGN-i46NNX_NSoafXfi90w7QdiJfrkagkkb2RAHFCVNqdv4DRMeJMLOd3FWOjxW7Cv4Loaz5qQ",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8081/api/cards/delete/2",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"api",
+						"cards",
+						"delete",
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Установка лимита на снятие",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJyb290QG1haWwuY29tIiwicm9sZSI6IkFETUlOIiwiZXhwIjoxNzQ5MDI4ODE5LCJpYXQiOjE3NDU0Mjg4MTl9.xSdBy2Bz5JMCqWdLTms7CRmZxijtgLgzmGU2N-9vi4Kc9JPFnM744C-9yyrIABayCdoXN0OGz2ERcJPhWxod3A",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"cardId\": 3,\r\n  \"type\": \"MONTHLY\",\r\n  \"amount\": 50000.0\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/api/limits",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"api",
+						"limits"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Просмотр лимитов по cardId",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c2VyMUBtYWlsLmNvbSIsInJvbGUiOiJVU0VSIiwiZXhwIjoxNzQ5MDk4ODcyLCJpYXQiOjE3NDU0OTg4NzJ9.gDk1Bm7dM59xi4skaItAU9lopvTv2KfOdWIraO8J9QMzTDes0eJLSsCNU_SeER_L7fGjD1C4HNkAv_iCX8q9IA",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8081/api/limits/14",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"api",
+						"limits",
+						"14"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Обновление лимита",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJyb290QG1haWwuY29tIiwicm9sZSI6IkFETUlOIiwiZXhwIjoxNzQ5MDI4ODE5LCJpYXQiOjE3NDU0Mjg4MTl9.xSdBy2Bz5JMCqWdLTms7CRmZxijtgLgzmGU2N-9vi4Kc9JPFnM744C-9yyrIABayCdoXN0OGz2ERcJPhWxod3A",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"amount\": 100000.0\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/api/limits/6",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"api",
+						"limits",
+						"6"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Удаление лимита",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJyb290QG1haWwuY29tIiwicm9sZSI6IkFETUlOIiwiZXhwIjoxNzQ5MDI5NTA3LCJpYXQiOjE3NDU0Mjk1MDd9.pm9-OSa91yDsAPSjA8ENqB17YAZNZbCGmvl8_4HnRCBe-pd4WRGAZKQJ8jmGBDP4xZbzAJd4diGTbsZNq9EwKw",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8081/api/limits/6",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"api",
+						"limits",
+						"6"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Перевод с карты на карту(transfer)",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c2VyMUBtYWlsLmNvbSIsInJvbGUiOiJVU0VSIiwiZXhwIjoxNzQ5MDM1NTAxLCJpYXQiOjE3NDU0MzU1MDF9.Ge5BkVY9MKrBU6gs3CRmvtu8IaTmtjXeJS1odmNVHJXpziabYtswf1__vXTSj0jdopcVCPjm-2Opa4XBjLEuPA",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"sourceCardId\": 4,\r\n  \"targetCardId\": 5,\r\n  \"amount\": 1000.0\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/api/transactions/transfer",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"api",
+						"transactions",
+						"transfer"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Снятие денег(withdraw)",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c2VyMUBtYWlsLmNvbSIsInJvbGUiOiJVU0VSIiwiZXhwIjoxNzQ5MDM1NTAxLCJpYXQiOjE3NDU0MzU1MDF9.Ge5BkVY9MKrBU6gs3CRmvtu8IaTmtjXeJS1odmNVHJXpziabYtswf1__vXTSj0jdopcVCPjm-2Opa4XBjLEuPA",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"cardId\": 4,\r\n  \"amount\": 1000.0\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/api/transactions/withdraw",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"api",
+						"transactions",
+						"withdraw"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Просмотр транзакций по номеру карты",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c2VyMUBtYWlsLmNvbSIsInJvbGUiOiJVU0VSIiwiZXhwIjoxNzQ5MTAwOTkyLCJpYXQiOjE3NDU1MDA5OTJ9.nkEAlSgZqjAqx0xr0QTxsZQt9GFODEchZ4oGSCpYOWmB0QiUBRrLukSf35s3DectV5Pd2-S7Lcs-rNaXRs59lA",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8081/api/transactions/card/1111111111111111",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"api",
+						"transactions",
+						"card",
+						"1111111111111111"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Просмотр всех транзакций",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJyb290QG1haWwuY29tIiwicm9sZSI6IkFETUlOIiwiZXhwIjoxNzQ5MTAxMTM0LCJpYXQiOjE3NDU1MDExMzR9.xpSYGe1XfnVy645GrSjfoHwcFcYZFmNpK17a3BUR7DLsxsBD_Z0-lmLjzPSXGkWk-hk8s8TYxA8ZXbsm-WtfGw",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8081/api/transactions",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"api",
+						"transactions"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
