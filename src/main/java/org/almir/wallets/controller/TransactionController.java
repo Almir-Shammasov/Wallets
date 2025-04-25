@@ -1,5 +1,10 @@
 package org.almir.wallets.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.almir.wallets.dto.TransactionResponseDTO;
@@ -22,13 +27,21 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/transactions")
+@Tag(name = "Transaction API", description = "Operations related to card transactions")
 public class TransactionController {
     private final TransactionService transactionService;
     private final TransactionMapper transactionMapper;
     private final SecurityUtils securityUtils;
 
     @PostMapping("/transfer")
-    public ResponseEntity<TransactionResponseDTO> transfer(@Valid @RequestBody TransferRequestDTO transferRequest) {
+    @Operation(summary = "Transfer money", description = "Transfers money from one card to another")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Transfer completed successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid request data"),
+            @ApiResponse(responseCode = "403", description = "Unauthorized operation")
+    })
+    public ResponseEntity<TransactionResponseDTO> transfer(
+            @Parameter(description = "Transfer request details") @Valid @RequestBody TransferRequestDTO transferRequest) {
         Transaction transaction = transactionService.transfer(
                 transferRequest.sourceCardId(),
                 transferRequest.targetCardId(),
@@ -39,7 +52,13 @@ public class TransactionController {
     }
 
     @PostMapping("/withdraw")
-    public ResponseEntity<TransactionResponseDTO> withdraw(@Valid @RequestBody WithdrawRequestDTO withdrawRequest) {
+    @Operation(summary = "Withdraw money", description = "Withdraws money from a card")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Withdrawal successful"),
+            @ApiResponse(responseCode = "400", description = "Invalid request or insufficient funds")
+    })
+    public ResponseEntity<TransactionResponseDTO> withdraw(
+            @Parameter(description = "Withdraw request details") @Valid @RequestBody WithdrawRequestDTO withdrawRequest) {
         Transaction transaction = transactionService.withdraw(
                 withdrawRequest.cardId(),
                 withdrawRequest.amount()
@@ -49,9 +68,14 @@ public class TransactionController {
     }
 
     @GetMapping
+    @Operation(summary = "Get all transactions",
+            description = "Retrieve paginated list of transactions for the current user or admin")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "List of transactions returned")
+    })
     public ResponseEntity<List<TransactionResponseDTO>> getAllTransactions(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @Parameter(description = "Page number") @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "Page size") @RequestParam(defaultValue = "10") int size) {
         User currentUser = securityUtils.getCurrentUser();
         Pageable pageable = PageRequest.of(page, size);
         long userId = currentUser.getId();
@@ -63,8 +87,14 @@ public class TransactionController {
     }
 
     @GetMapping("/card/{cardNumber}")
+    @Operation(summary = "Get transactions by card number",
+            description = "Retrieve all transactions for a specific card")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "List of transactions returned"),
+            @ApiResponse(responseCode = "403", description = "Access denied for this card")
+    })
     public ResponseEntity<List<TransactionResponseDTO>> getTransactionsByCardNumber(
-            @PathVariable String cardNumber) {
+            @Parameter(description = "Card number") @PathVariable String cardNumber) {
         User currentUser = securityUtils.getCurrentUser();
         long userId = currentUser.getId();
         String role = currentUser.getRole().name();
